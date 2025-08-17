@@ -71,7 +71,7 @@ app.add_middleware(
     allow_headers=["*"],           # allow all headers
 )
 
-LLM_TIMEOUT_SECONDS = int(os.getenv("LLM_TIMEOUT_SECONDS", 150))
+LLM_TIMEOUT_SECONDS = int(os.getenv("LLM_TIMEOUT_SECONDS", 250))
 
 
 # CORS Setup Ends #
