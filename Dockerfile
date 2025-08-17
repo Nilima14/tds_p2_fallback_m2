@@ -1,21 +1,21 @@
-# Use official Python image
-FROM python:3.11-slim
+# Use an official Python runtime as a parent image
+FROM python:3.10-slim
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy requirements and install dependencies
-COPY requirements.txt .
+# Copy the current directory contents into the container at /app
+COPY requirements.txt ./
+
+# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the app
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Run app.py when the container launches
+# Run main.py from project root when the container launches
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+
+# Now copy the rest of the code
 COPY . .
-
-# Expose port 8080 for DigitalOcean App Platform
-EXPOSE 8080
-
-# Set environment variable for production
-ENV PYTHONUNBUFFERED=1
-
-# Start FastAPI app with gunicorn
-CMD ["gunicorn", "app:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker"]
