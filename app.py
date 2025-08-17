@@ -68,7 +68,8 @@ app = FastAPI(title="TDS Data Analyst Agent")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],         # list of allowed origins
+    # list of allowed origins, allowing all as the evaluation origin may change
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],           # allow all HTTP methods
     allow_headers=["*"],           # allow all headers
