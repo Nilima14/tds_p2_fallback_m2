@@ -15,7 +15,7 @@ EXPOSE 80
 
 # Run app.py when the container launches
 # Run main.py from project root when the container launches
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
 
 # Now copy the rest of the code
 COPY . .
