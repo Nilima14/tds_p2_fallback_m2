@@ -17,5 +17,5 @@ EXPOSE 8080
 # Set environment variable for production
 ENV PYTHONUNBUFFERED=1
 
-# Start FastAPI app with uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+# Start FastAPI app with gunicorn
+CMD ["gunicorn", "app:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker"]
