@@ -1,4 +1,3 @@
-
 from fastapi.responses import FileResponse, Response
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,11 +13,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
-import os
-import re
-import json
-import base64
-import tempfile
 import subprocess
 import logging
 from io import BytesIO
@@ -28,6 +22,8 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi import FastAPI
 from dotenv import load_dotenv
+
+import tabula
 
 
 import requests
@@ -179,6 +175,15 @@ def scrape_url_to_dataframe(url: str) -> Dict[str, Any]:
                 soup = BeautifulSoup(html_content, "html.parser")
                 text = soup.get_text(separator="\n", strip=True)
                 df = pd.DataFrame({"text": [text]})
+
+        # --- PDF ---
+        elif "application/pdf" in ctype or url.lower().endswith(".pdf"):
+            try:
+                tables = tabula.read_pdf(BytesIO(resp.content), pages="all")
+                if tables:
+                    df = tables[0]
+            except Exception as e:
+                df = pd.DataFrame({"text": [str(e)]})
 
         # --- Unknown type fallback ---
         else:
@@ -585,6 +590,13 @@ async def analyze_data(request: Request):
                 except Exception as e:
                     raise HTTPException(
                         400, f"Image processing failed: {str(e)}")
+            elif filename.endswith(".pdf"):
+                try:
+                    tables = tabula.read_pdf(BytesIO(content), pages="all")
+                    if tables:
+                        df = tables[0]
+                except Exception as e:
+                    df = pd.DataFrame({"text": [str(e)]})
             else:
                 raise HTTPException(
                     400, f"Unsupported data file type: {filename}")
@@ -753,6 +765,7 @@ async def analyze_get_info():
 
     })
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+# You do NOT need this block if you are running with:
+# uvicorn app:app --host 0.0.0.0 --port 80
+# DigitalOcean App Platform will start your app using the command you specify.
+# This block is only needed if you want to run the app by executing `python app.py` directly.
